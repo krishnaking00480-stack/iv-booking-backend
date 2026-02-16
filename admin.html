@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color:white;
+    padding:20px;
+}
+
+h2{
+    text-align:center;
+}
+
+button{
+    padding:10px 20px;
+    background:#00c6ff;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    color:black;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+th{
+    background:#2a5298;
+    color:white;
+    padding:10px;
+}
+
+td{
+    padding:8px;
+    text-align:center;
+}
+
+tr:nth-child(even){
+    background:#f2f2f2;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>IV Registration Admin Panel</h2>
+<h3>Total Registered: <span id="totalCount">0</span></h3>
+<div id="placeCounts" style="margin-bottom:20px; font-weight:bold;">
+    Ooty: 0 |
+    Coimbatore: 0 |
+    Bangalore: 0 |
+    Kodaikanal: 0
+</div>
+
+<button onclick="loadData()">Load Students</button>
+
+<table id="table">
+<tr>
+<th>Name</th>
+<th>Reg No</th>
+<th>Place</th>
+<th>Status</th>
+<th>Reason</th>
+</tr>
+</table>
+
+<script>
+async function loadData() {
+
+    const res = await fetch("http://localhost:5000/students");
+    const data = await res.json();
+
+    // 🔢 Total Count
+    document.getElementById("totalCount").innerText = data.length;
+
+    // 🏞 Place Counts
+    let ooty = 0;
+    let coimbatore = 0;
+    let bangalore = 0;
+    let kodaikanal = 0;
+
+    data.forEach(student => {
+        if (student.place === "Ooty") ooty++;
+        if (student.place === "Coimbatore") coimbatore++;
+        if (student.place === "Bangalore") bangalore++;
+        if (student.place === "Kodaikanal") kodaikanal++;
+    });
+
+    document.getElementById("placeCounts").innerText =
+        `Ooty: ${ooty} | Coimbatore: ${coimbatore} | Bangalore: ${bangalore} | Kodaikanal: ${kodaikanal}`;
+
+    // 🧹 Clear table
+    const table = document.getElementById("table");
+
+    table.innerHTML = `
+    <tr>
+        <th>Name</th>
+        <th>Reg No</th>
+        <th>Place</th>
+        <th>Status</th>
+        <th>Reason</th>
+    </tr>
+    `;
+
+    // 📋 Insert rows
+    data.forEach(student => {
+        const row = table.insertRow();
+
+        row.insertCell(0).innerText = student.name;
+        row.insertCell(1).innerText = student.regNo;
+        row.insertCell(2).innerText = student.place;
+        row.insertCell(3).innerText = student.status;
+        row.insertCell(4).innerText = student.reason || "-";
+    });
+}
+</script>
+
+
+
+</body>
+</html>

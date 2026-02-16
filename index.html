@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>IV Registration</title>
+<style>
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url("https://images.unsplash.com/photo-1501785888041-af3ef285b470") no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+h2 {
+    text-align: center;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #2e8b57;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #256d47;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>College IV Registration</h2>
+
+<form id="ivForm">
+
+<input type="text" id="name" placeholder="Name" required>
+
+<input type="text" id="regNo" placeholder="Register Number" required>
+
+<select id="place" required>
+<option value="">Select Place</option>
+<option>Ooty</option>
+<option>Coimbatore</option>
+<option>Bangalore</option>
+<option>Kodaikanal</option>
+</select>
+
+<select id="status" required onchange="toggleReason()">
+<option value="">Select Status</option>
+<option>Interested</option>
+<option>Not Interested</option>
+</select>
+
+<textarea id="reason" placeholder="Reason" style="display:none;"></textarea>
+
+<button type="submit">Submit</button>
+
+</form>
+</div>
+
+<script>
+function toggleReason() {
+    const status = document.getElementById("status").value;
+    const reasonBox = document.getElementById("reason");
+
+    if (status === "Not Interested") {
+        reasonBox.style.display = "block";
+        reasonBox.required = true;
+    } else {
+        reasonBox.style.display = "none";
+        reasonBox.required = false;
+    }
+}
+
+document.getElementById("ivForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const form = document.getElementById("ivForm");
+
+    const data = {
+        name: form.name.value,
+        regNo: form.regNo.value,
+        place: form.place.value,
+        status: form.status.value,
+        reason: form.reason.value
+    };
+
+    const res = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    alert(result.message);
+
+    if(res.ok){
+        form.reset();   // 🔥 clears form
+        document.getElementById("reason").style.display = "none";
+    }
+});
+</script>
+
+
+</body>
+</html>
