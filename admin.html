@@ -3,7 +3,6 @@
 <head>
 <title>Admin Dashboard</title>
 <style>
-
 body{
     margin:0;
     font-family:Arial;
@@ -11,11 +10,7 @@ body{
     color:white;
     padding:20px;
 }
-
-h2{
-    text-align:center;
-}
-
+h2{text-align:center;}
 button{
     padding:10px 20px;
     background:#00c6ff;
@@ -24,7 +19,6 @@ button{
     cursor:pointer;
     margin-bottom:20px;
 }
-
 table{
     width:100%;
     border-collapse:collapse;
@@ -33,22 +27,16 @@ table{
     border-radius:10px;
     overflow:hidden;
 }
-
 th{
     background:#2a5298;
     color:white;
     padding:10px;
 }
-
 td{
     padding:8px;
     text-align:center;
 }
-
-tr:nth-child(even){
-    background:#f2f2f2;
-}
-
+tr:nth-child(even){ background:#f2f2f2; }
 </style>
 </head>
 
@@ -56,11 +44,9 @@ tr:nth-child(even){
 
 <h2>IV Registration Admin Panel</h2>
 <h3>Total Registered: <span id="totalCount">0</span></h3>
+
 <div id="placeCounts" style="margin-bottom:20px; font-weight:bold;">
-    Ooty: 0 |
-    Coimbatore: 0 |
-    Bangalore: 0 |
-    Kodaikanal: 0
+    Ooty: 0 | Coimbatore: 0 | Bangalore: 0 | Kodaikanal: 0
 </div>
 
 <button onclick="loadData()">Load Students</button>
@@ -76,57 +62,54 @@ tr:nth-child(even){
 </table>
 
 <script>
+const BASE_URL = "YOUR_RENDER_URL";   // 🔥 Replace this
+
 async function loadData() {
+    try {
+        const res = await fetch(`${BASE_URL}/students`);
+        const data = await res.json();
 
-    const res = await fetch("http://localhost:5000/students");
-    const data = await res.json();
+        document.getElementById("totalCount").innerText = data.length;
 
-    // 🔢 Total Count
-    document.getElementById("totalCount").innerText = data.length;
+        let ooty = 0, coimbatore = 0, bangalore = 0, kodaikanal = 0;
 
-    // 🏞 Place Counts
-    let ooty = 0;
-    let coimbatore = 0;
-    let bangalore = 0;
-    let kodaikanal = 0;
+        data.forEach(student => {
+            if (student.place === "Ooty") ooty++;
+            if (student.place === "Coimbatore") coimbatore++;
+            if (student.place === "Bangalore") bangalore++;
+            if (student.place === "Kodaikanal") kodaikanal++;
+        });
 
-    data.forEach(student => {
-        if (student.place === "Ooty") ooty++;
-        if (student.place === "Coimbatore") coimbatore++;
-        if (student.place === "Bangalore") bangalore++;
-        if (student.place === "Kodaikanal") kodaikanal++;
-    });
+        document.getElementById("placeCounts").innerText =
+            `Ooty: ${ooty} | Coimbatore: ${coimbatore} | Bangalore: ${bangalore} | Kodaikanal: ${kodaikanal}`;
 
-    document.getElementById("placeCounts").innerText =
-        `Ooty: ${ooty} | Coimbatore: ${coimbatore} | Bangalore: ${bangalore} | Kodaikanal: ${kodaikanal}`;
+        const table = document.getElementById("table");
 
-    // 🧹 Clear table
-    const table = document.getElementById("table");
+        table.innerHTML = `
+        <tr>
+            <th>Name</th>
+            <th>Reg No</th>
+            <th>Place</th>
+            <th>Status</th>
+            <th>Reason</th>
+        </tr>`;
 
-    table.innerHTML = `
-    <tr>
-        <th>Name</th>
-        <th>Reg No</th>
-        <th>Place</th>
-        <th>Status</th>
-        <th>Reason</th>
-    </tr>
-    `;
+        data.forEach(student => {
+            const row = table.insertRow();
+            row.insertCell(0).innerText = student.name;
+            row.insertCell(1).innerText = student.regNo;
+            row.insertCell(2).innerText = student.place;
+            row.insertCell(3).innerText = student.status;
+            row.insertCell(4).innerText = student.reason || "-";
+        });
 
-    // 📋 Insert rows
-    data.forEach(student => {
-        const row = table.insertRow();
-
-        row.insertCell(0).innerText = student.name;
-        row.insertCell(1).innerText = student.regNo;
-        row.insertCell(2).innerText = student.place;
-        row.insertCell(3).innerText = student.status;
-        row.insertCell(4).innerText = student.reason || "-";
-    });
+    } catch (err) {
+        alert("Failed to load data. Check backend deployment.");
+        console.error(err);
+    }
 }
 </script>
 
-
-
 </body>
 </html>
+
